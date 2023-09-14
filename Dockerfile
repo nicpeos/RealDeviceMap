@@ -1,7 +1,7 @@
 # ================================
 # Build image
 # ================================
-FROM swift:5.4-focal as build
+FROM swiftarm/swift:5.4.1-ubuntu-20.04 as build
 WORKDIR /build
 
 # Perfect-COpenSSL
@@ -22,7 +22,7 @@ RUN apt-get -y update && apt-get install -y wget
 # MySQL Client
 RUN apt-get -y update && \
 	apt-get install -y lsb-release mysql-client libmysqlclient-dev && \
-	sed -i -e 's/-fabi-version=2 -fno-omit-frame-pointer//g' /usr/lib/x86_64-linux-gnu/pkgconfig/mysqlclient.pc
+	sed -i -e 's/-fabi-version=2 -fno-omit-frame-pointer//g' /usr/lib/aarch64-linux-gnu/pkgconfig/mysqlclient.pc
 
 # Pre-Build
 COPY Package.swift Package.swift
@@ -42,7 +42,7 @@ RUN swift build -c release -Xswiftc -g
 # ================================
 # Run image
 # ================================
-FROM swift:5.4-focal-slim
+FROM swiftarm/swift:5.4.1-ubuntu-20.04
 WORKDIR /app
 
 # Install dependencies for
@@ -63,7 +63,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 	wget \
 	lsb-release mysql-client libmysqlclient-dev && \
 	cp /usr/bin/convert /usr/local/bin && \
-	sed -i -e 's/-fabi-version=2 -fno-omit-frame-pointer//g' /usr/lib/x86_64-linux-gnu/pkgconfig/mysqlclient.pc && \
+	sed -i -e 's/-fabi-version=2 -fno-omit-frame-pointer//g' /usr/lib/aarch64-linux-gnu/pkgconfig/mysqlclient.pc && \
 	rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Copy build artifacts
